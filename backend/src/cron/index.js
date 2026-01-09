@@ -5,7 +5,7 @@ const calendarService = require('../services/calendar');
 const gmailService = require('../services/gmail');
 
 // Priority projects get full chief of staff features
-const PRIORITY_PROJECTS = ['vlaid', 'willow-co', 'network'];
+const PRIORITY_PROJECTS = ['vlaid', 'willow-co', 'network', 'graphene', 'maturi'];
 
 // All projects (for later expansion)
 const ALL_PROJECTS = [
