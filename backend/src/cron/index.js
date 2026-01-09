@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const slackService = require('../services/slack');
 const githubService = require('../services/github');
 const calendarService = require('../services/calendar');
+const gmailService = require('../services/gmail');
 
 // Priority projects get full chief of staff features
 const PRIORITY_PROJECTS = ['vlaid', 'willow-co', 'network'];
@@ -21,14 +22,22 @@ async function sendMorningBriefs() {
 
   try {
     const schedule = await calendarService.getScheduleSummary();
+    const emailCounts = await gmailService.getEmailCountSummary();
 
     for (const project of PRIORITY_PROJECTS) {
       const yesterdaySummary = await githubService.getYesterdaySummary(project);
+      const emailCount = emailCounts[project] || 0;
+
+      // Add email info to yesterday summary if available
+      let enhancedYesterday = yesterdaySummary || '';
+      if (emailCount > 0) {
+        enhancedYesterday += `\n📧 ${emailCount} email(s) sent related to ${project}`;
+      }
 
       await slackService.sendMorningBrief(project, {
         schedule: schedule[project] || [],
-        tasks: [], // Will be populated when Linear is integrated
-        yesterday: yesterdaySummary
+        tasks: [],
+        yesterday: enhancedYesterday
       });
 
       // Small delay between messages
